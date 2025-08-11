@@ -1,0 +1,12 @@
+services:
+  console:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+
+  composer:
+    image: composer:latest
+    volumes:
+      - .:/app
+    working_dir: /app
