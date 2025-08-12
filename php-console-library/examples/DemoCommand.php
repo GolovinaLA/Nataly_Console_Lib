@@ -35,25 +35,61 @@ class DemoCommand implements CommandInterface
      */
     public function execute(array $args, array $params): string
     {
-        // Вывод описание по команде, если агрумент = help
+        // Вывод описания по команде, если агрумент = help
        if (isset($args[0]) && $args[0] == "help") {
         return $this->getDescription();
        }
        else {
-            $output = "Запуск команды:\n";
+            $output = "Запуск команды demo: \n";
             
             if (!empty($args)) {
-                $output .= "Аргументы: " . implode(', ', $args) . "\n";
+                $output .= "Аргументы: \n\t- " . implode(" \n\t- ", $args) . "\n\n";
             }
             
             if (!empty($params)) {
-                $output .= "Параметры:\n";
-                foreach ($params as $name => $value) {
-                    $valueStr = is_array($value) ? implode(', ', $value) : $value;
-                    $output .= "  $name: $valueStr\n";
+                $outputParams = $this->printParams($params,1);
+            }
+
+            $output .= "Параметры: \n" . $outputParams;
+            return $output;
+        }       
+    }
+
+    /**
+     * Форматирует массив параметров в строку для вывода на экран с отступами
+     * 
+     * @param array $params Массив параметров
+     * @param int $indent Начальный уровень отступа в кол-ве табов
+     * @return string Форматированная строка
+     */
+    private function printParams(array $params, int $indent = 0): string
+    {
+        $result = '';
+        $tab = str_repeat("\t", $indent);
+    
+        foreach ($params as $key => $value) {
+            // Не печатаем цифровые индексы в конечном уровне вложенности массива
+            if (is_int($key)) {
+                if (is_array($value)) {
+                    $result .= $this->printParams($value, $indent);
+                } else {
+                    $result .= "{$tab}- {$value}\n";
+                }
+            } 
+            // Для ассоциативных элементов массива
+            else {
+                $result .= "{$tab}- {$key}:\n";
+                if (is_array($value)) {
+                    $result .= $this->printParams($value, $indent + 1);
+                } else {
+                    $valueTab = str_repeat("\t", $indent + 1);
+                    $formattedValue = is_bool($value) 
+                        ? ($value ? 'true' : 'false') 
+                        : $value;
+                    $result .= "{$valueTab}- {$formattedValue}\n";
                 }
             }
-            return $output;
-        }
+        }        
+        return $result;
     }
 }
