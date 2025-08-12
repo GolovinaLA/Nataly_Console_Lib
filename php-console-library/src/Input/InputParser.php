@@ -18,13 +18,15 @@ class InputParser
         $commandName = $argv[1] ?? null;
         $args = [];
         $params = [];
+        $args = [];
 
         for ($i = 2; $i < count($argv); $i++) {
+
             $arg = $argv[$i];
         
             if (str_starts_with($arg, '{') && str_ends_with($arg, '}')) {
 
-                $args = preg_split('/[{} ,]/', $arg, -1, PREG_SPLIT_NO_EMPTY);
+                $args = array_merge($args, preg_split('/[{} ,]/', $arg, -1, PREG_SPLIT_NO_EMPTY));
             } 
             elseif (str_starts_with($arg, '[') && str_ends_with($arg, ']')) {
                 $content = substr($arg, 1, -1); // Удаляем внешние скобки
@@ -39,7 +41,7 @@ class InputParser
     }
 
         /**
-     * Разбирает параметры формата [name=value] либо [name=value1, value2, value3]
+     * Разбирает параметры
      * 
      * @param string $arg Строка параметра
      * @param array &$params Ссылка на массив параметров
@@ -56,7 +58,7 @@ class InputParser
             $value = trim($parts[1]);
             
             if (str_starts_with($value, '{') && str_ends_with($value, '}')) {
-                // Обработка массива значений {value1,value2}
+                // Обработка массива значений типа {value1,value2}
                 $params[$key] = array_map('trim', 
                     explode(',', trim($value, '{}'))
                 );
