@@ -35,11 +35,18 @@ class DemoCommand implements CommandInterface
      */
     public function execute(array $args, array $params): string
     {
-        // Вывод описания по команде, если агрумент = help
-       if (isset($args[0]) && $args[0] == "help") {
-        return $this->getDescription();
-       }
-       else {
+        // Вывод описания по команде, если агрумент = help          
+        if (isset($args[0]) && $args[0] == "help") {
+            return $this->getDescription();
+        }
+        else {
+            // Нормализация параметров (исправление для Bash)
+            foreach ($params as $key => &$value) {
+                if (is_string($value) && strpos($value, ',') !== false) {
+                    $value = array_map('trim', explode(',', $value));
+                }
+            }
+            unset($value);
             $output = "Запуск команды demo: \n";
             
             if (!empty($args)) {
@@ -47,12 +54,11 @@ class DemoCommand implements CommandInterface
             }
             
             if (!empty($params)) {
-                $outputParams = $this->printParams($params,1);
+                $output .= "Параметры: \n" . $this->printParams($params, 1);
             }
 
-            $output .= "Параметры: \n" . $outputParams;
             return $output;
-        }       
+        }
     }
 
     /**

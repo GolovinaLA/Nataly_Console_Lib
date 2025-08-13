@@ -52,7 +52,6 @@ class Application
         try {
             $input = $this->inputParser->parse($argv);
             
-            
             if ($input->getCommandName() === null) {
                 $this->showHelp();
                 return;
